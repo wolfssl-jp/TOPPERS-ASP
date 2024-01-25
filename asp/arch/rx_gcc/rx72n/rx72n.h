@@ -4,8 +4,8 @@
  *      Advanced Standard Profile Kernel
  *
  *  Copyright (C) 2008-2010 by Witz Corporation, JAPAN
- *  Copyright (C) 2022 wolfSSL Inc.
- * 
+ *  Copyright (C) 2022-2024 by wolfSSL Inc.
+ *
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
  *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
  *  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．

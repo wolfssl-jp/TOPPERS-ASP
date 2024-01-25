@@ -1,0 +1,66 @@
+=====================================================================
+                  RX72N Renesas Starter Kitターゲット依存部
+                                  Last Modified: '24/1/24
+=====================================================================
+
+
+○概要
+
+RZ72N_GCC ターゲット依存部は，プロセッサにRX72Nを搭載した，ルネサス
+エレクトロニクス製の RX72N Renesas Starter Kitをサポートしている．
+
+ルネサス社 e2Studio を使用しビルドを行う。サンプルプログラムは下記よりダウンロードする
+https://github.com/wolfSSL/wolfssl-examples/tree/master/TOPPERS
+
+
+○カーネルの使用リソース
+
+カーネルは以下のリソースを使用する．
+
+  ・ROM
+     ROM化の場合にコードを配置する．
+     使用量は使用するAPIの数に依存する．
+
+  ・RAM
+     データを配置する．使用量はオブジェクト数に依存する．
+
+  ・コンペアマッチタイマ0
+     カーネル内部のティックの生成に用いる．
+
+
+○デバッグ環境
+
+動作確認を行ったデバッガは、E2 Lite(RX) エミュレータである．
+
+
+○コンパイラ
+
+以下の開発環境を用いて動作確認を行った．
+
+処理系
+　GCC for Renesas RX 8.3.0.202305
+
+統合開発環境
+　ルネサステクノロジ製 e2Studio 2023-07 (23.7.0)
+  FIPモジュール
+  　r_bsp      : v7.1
+    r_cmt_rx   : v5.1
+    r_ether_rx : v1.22
+    r_t4_rx    : v2.10
+    r_t4_driver_rx : v1.09
+
+○コンソール出力
+e2Studio付属のRenesas Debug Virtual Consol を使用。
+Renesas Debug Vitual Consol を使用するために、ルネサス社製のFIPドライバを使用する。
+
+
+○TOPPERS/ASPおよびサンプルプログラムのビルド手順
+https://github.com/wolfSSL/wolfssl-examples/blob/master/TOPPERS/README-jp.mdを参照のこと
+
+○注意事項
+
+
+
+○変更履歴
+2024/1/24  ・新規作成                     wolfSSL
+

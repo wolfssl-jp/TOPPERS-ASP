@@ -8,6 +8,8 @@
  *  Copyright (C) 2004-2012 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
+ *  Copyright (C) 2023-2024 by wolfSSL Inc
+ *  
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
  *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
  *  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
@@ -41,68 +43,26 @@
  */
 
 /* 
- *  サンプルプログラム(1)の本体
+ *  サンプルプログラムの本体
  *
- *  ASPカーネルの基本的な動作を確認するためのサンプルプログラム．
+ *  TOPPERS/ASPカーネル上で動く wolfSSL のサンプルプログラム
  *
  *  プログラムの概要:
+ *  
+ *  TASK1: ダミータスク
+ *  TASK2: T4 Tiny Drive 用タスク
+ *  TASK3: wolfSSL アプリケーション
+ *         マクロの切り替えで下記動作を行う
+ *          Crypt Test
+ *          Benchmark
+ *          TLS Client
+ *          TLS Server
+ *  
+ *  wolfSSL サンプルプログラムの動かし方については下記を参照ください、
+ *   日本語 https://github.com/wolfSSL/wolfssl-examples/blob/master/TOPPERS/README-jp.md
+ *   英語   https://github.com/wolfSSL/wolfssl-examples/blob/master/TOPPERS/README-en.md
+ *  
  *
- *  ユーザインタフェースを受け持つメインタスク（タスクID: MAIN_TASK，優
- *  先度: MAIN_PRIORITY）と，3つの並行実行されるタスク（タスクID:
- *  TASK1〜TASK3，初期優先度: MID_PRIORITY）で構成される．また，起動周
- *  期が2秒の周期ハンドラ（周期ハンドラID: CYCHDR1）を用いる．
- *
- *  並行実行されるタスクは，task_loop回空ループを実行する度に，タスクが
- *  実行中であることをあらわすメッセージを表示する．空ループを実行する
- *  のは，空ループなしでメッセージを出力すると，多量のメッセージが出力
- *  され，プログラムの動作が確認しずらくなるためである．また，低速なシ
- *  リアルポートを用いてメッセージを出力する場合に，すべてのメッセージ
- *  が出力できるように，メッセージの量を制限するという理由もある．
- *
- *  周期ハンドラは，三つの優先度（HIGH_PRIORITY，MID_PRIORITY，
- *  LOW_PRIORITY）のレディキューを回転させる．プログラムの起動直後は，
- *  周期ハンドラは停止状態になっている．
- *
- *  メインタスクは，シリアルI/Oポートからの文字入力を行い（文字入力を
- *  待っている間は，並行実行されるタスクが実行されている），入力された
- *  文字に対応した処理を実行する．入力された文字と処理の関係は次の通り．
- *  Control-Cまたは'Q'が入力されると，プログラムを終了する．
- *
- *  '1' : 対象タスクをTASK1に切り換える（初期設定）．
- *  '2' : 対象タスクをTASK2に切り換える．
- *  '3' : 対象タスクをTASK3に切り換える．
- *  'a' : 対象タスクをact_tskにより起動する．
- *  'A' : 対象タスクに対する起動要求をcan_actによりキャンセルする．
- *  'e' : 対象タスクにext_tskを呼び出させ，終了させる．
- *  't' : 対象タスクをter_tskにより強制終了する．
- *  '>' : 対象タスクの優先度をHIGH_PRIORITYにする．
- *  '=' : 対象タスクの優先度をMID_PRIORITYにする．
- *  '<' : 対象タスクの優先度をLOW_PRIORITYにする．
- *  'G' : 対象タスクの優先度をget_priで読み出す．
- *  's' : 対象タスクにslp_tskを呼び出させ，起床待ちにさせる．
- *  'S' : 対象タスクにtslp_tsk(10秒)を呼び出させ，起床待ちにさせる．
- *  'w' : 対象タスクをwup_tskにより起床する．
- *  'W' : 対象タスクに対する起床要求をcan_wupによりキャンセルする．
- *  'l' : 対象タスクをrel_waiにより強制的に待ち解除にする．
- *  'u' : 対象タスクをsus_tskにより強制待ち状態にする．
- *  'm' : 対象タスクの強制待ち状態をrsm_tskにより解除する．
- *  'd' : 対象タスクにdly_tsk(10秒)を呼び出させ，時間経過待ちにさせる．
- *  'x' : 対象タスクに例外パターン0x0001の例外処理を要求する．
- *  'X' : 対象タスクに例外パターン0x0002の例外処理を要求する．
- *  'y' : 対象タスクにdis_texを呼び出させ，タスク例外を禁止する．
- *  'Y' : 対象タスクにena_texを呼び出させ，タスク例外を許可する．
- *  'r' : 3つの優先度（HIGH_PRIORITY，MID_PRIORITY，LOW_PRIORITY）のレ
- *        ディキューを回転させる．
- *  'c' : 周期ハンドラを動作開始させる．
- *  'C' : 周期ハンドラを動作停止させる．
- *  'b' : アラームハンドラを5秒後に起動するよう動作開始させる．
- *  'B' : アラームハンドラを動作停止させる．
- *  'z' : 対象タスクにCPU例外を発生させる（タスクを終了させる）．
- *  'Z' : 対象タスクにCPUロック状態でCPU例外を発生させる（プログラムを
- *        終了する）．
- *  'V' : get_utmで性能評価用システム時刻を2回読む．
- *  'v' : 発行したシステムコールを表示する（デフォルト）．
- *  'q' : 発行したシステムコールを表示しない．
  */
 
 #include <kernel.h>
@@ -146,7 +106,7 @@ void sigsem_ether_wrapper() {
 }
 
 /*
- *  並行実行されるタスク
+ *  ダミータスク
  */
 void task(intptr_t exinf)
 {
@@ -160,9 +120,6 @@ void task(intptr_t exinf)
 
 	while (true) {
 		tslp_tsk(500);
-		syslog(LOG_NOTICE, "task%d is running (%03d).   %s",
-					tskno, ++n, graph[tskno-1]);
-
 	}
 }
 
@@ -268,14 +225,6 @@ void main_task(intptr_t exinf)
 	syslog(LOG_NOTICE, "Sample program starts (exinf = %d).", (int_t) exinf);
 
 	/*
-	 *  シリアルポートの初期化
-	 *
-	 *  システムログタスクと同じシリアルポートを使う場合など，シリアル
-	 *  ポートがオープン済みの場合にはここでE_OBJエラーになるが，支障は
-	 *  ない．
-	 */
-
-	/*
  	 *  ループ回数の設定
 	 *
 	 *  並行実行されるタスク内での空ループの回数（task_loop）は，空ルー
@@ -330,10 +279,10 @@ void main_task(intptr_t exinf)
  	 *  タスクの起動
 	 */
 	SVC_PERROR(act_tsk(TASK1));
+#if defined(RX72N_WOLF_APPLICATION)
 	SVC_PERROR(act_tsk(TASK2));
 	SVC_PERROR(act_tsk(TASK3));
-	SVC_PERROR(act_tsk(TASK4));
-
+#endif
 	/*
  	 *  メインループ
 	 */

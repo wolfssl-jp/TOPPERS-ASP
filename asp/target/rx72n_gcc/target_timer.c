@@ -11,7 +11,7 @@
  *                                          RICOH COMPANY,LTD. JAPAN
  *  Copyright (C) 2008-2010 by Witz Corporation, JAPAN
  *  Copyright (C) 2016- by Hisashi Hata, JAPAN
- *  Copyright (C) 2022 wolfSSL Inc.
+ *  Copyright (C) 2023 wolfSSL Inc.
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
  *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
@@ -45,7 +45,7 @@
  */
 
 /*
- *		タイマドライバ（RX63n 用）
+ *		タイマドライバ（RX72N)
  */
 
 #include "kernel_impl.h"
@@ -152,7 +152,7 @@ void target_timer_cmt1_handler(void)
 	i_begin_int(INHNO_TIMER_CMT1);
 
 	signal_time();				/* タイムティックの供給 */
-	timer_int_Wrapper();
+	timer_cm1_int_Wrapper();
 	i_end_int(INHNO_TIMER_CMT1);
 }
 void target_timer_cmt2_handler(void)
