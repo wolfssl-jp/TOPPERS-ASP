@@ -133,8 +133,8 @@ typedef uint16_t	CLOCK;
  *	ターゲットシステム依存モジュール（RX72N用 Timer (CMT0) Interrupt Wrapper）
  */
 
-extern void timer_int_Wrapper();
-
+extern void timer_cm1_int_Wrapper();
+extern void timer_cm2_int_Wrapper();
 
 /*
  *  タイマの起動処理

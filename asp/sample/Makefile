@@ -2,13 +2,13 @@
 #  TOPPERS/ASP Kernel
 #      Toyohashi Open Platform for Embedded Real-Time Systems/
 #      Advanced Standard Profile Kernel
-# 
+#
 #  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
 #                              Toyohashi Univ. of Technology, JAPAN
 #  Copyright (C) 2006-2014 by Embedded and Real-Time Systems Laboratory
 #              Graduate School of Information Science, Nagoya Univ., JAPAN
-#  Copyright (C) 2022 wolfSSL Inc.
-#  
+#  Copyright (C) 2022-2024 by wolfSSL Inc.
+#
 #  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
 #  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
 #  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
@@ -31,15 +31,15 @@
 #      また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
 #      由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
 #      免責すること．
-# 
+#
 #  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
 #  よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
 #  に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
-# 
+#
 #  $Id: Makefile 2594 2014-01-02 07:08:54Z ertl-hiro $
-# 
+#
 
 #
 #  ターゲットの指定（Makefile.targetで上書きされるのを防ぐため）
@@ -325,19 +325,19 @@ banner.o: kernel_cfg.timestamp $(filter-out banner.o,$(ALL_OBJS)) $(LIBS_DEP)
 #
 #  全体のリンク
 #
-$(OBJFILE): $(APPL_CFG) kernel_cfg.timestamp $(ALL_OBJS) $(LIBS_DEP) 
-	
+$(OBJFILE): $(APPL_CFG) kernel_cfg.timestamp $(ALL_OBJS) $(LIBS_DEP)
+
 	$(LINK) $(CFLAGS) $(LDFLAGS) -o '${C_PROJECT}'/toppers_rx/$(OBJFILE) $(START_OBJS) \
 			$(APPL_OBJS) $(SYSSVC_OBJS) $(CFG_OBJS) $(ALL_LIBS) $(END_OBJS)
-	
+
 		rm -f '${C_PROJECT}'/toppers_rx/libasp.a
-	$(AR) -d  libasp.a bsp_dummy.o 		
+	$(AR) -d  libasp.a bsp_dummy.o
 	$(AR) -rcs '${C_PROJECT}'/toppers_rx/libasp.a $(ALL_OBJS) $(KERNEL_LIB_OBJS)
 
 	$(NM) -n '${C_PROJECT}'/toppers_rx/$(OBJFILE) > $(OBJNAME).syms
-	
+
 	$(OBJCOPY) -O srec -S '${C_PROJECT}'/toppers_rx/$(OBJFILE) $(OBJNAME).srec
-	
+
 	$(CFG) --pass 3 --kernel asp $(INCLUDES) \
 				--rom-image $(OBJNAME).srec --symbol-table $(OBJNAME).syms \
 				-T $(TARGETDIR)/target_check.tf $(CFG_TABS) $<
